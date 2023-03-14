@@ -1,29 +1,25 @@
 package com.example.keycloakwithkong.Controller;
 
-import com.example.keycloakwithkong.utils.GenerateJWT;
-import com.nimbusds.openid.connect.sdk.claims.Gender;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.keycloak.KeycloakPrincipal;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.keycloak.KeycloakSecurityContext;
+import javax.servlet.http.HttpServletRequest;
 
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
 public class MainController {
 
-    private final GenerateJWT generateJWT;
-
-    @Value("${spring.keycloak.realm}")
-    private String realmName;
-    @GetMapping("/user")
-    public String index(Principal principal){
-        return "User's Keycloak ID: " + principal.getName();
+    @GetMapping("/protected-resource")
+    public ResponseEntity<String> getProtectedResource(Authentication authentication) {
+        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) authentication.getPrincipal();
+        KeycloakSecurityContext keycloakSecurityContext = keycloakPrincipal.getKeycloakSecurityContext();
+        String accessTokenString = keycloakSecurityContext.getTokenString();
+        return ResponseEntity.ok("Hello, you have successfully authenticated with JWT token: " + accessTokenString);
     }
 
-    @GetMapping("/generate-jwt")
-    public String generateToken(){
-        return generateJWT.getToken();
-    }
 }

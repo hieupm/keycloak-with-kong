@@ -7,3 +7,8 @@ services:
     environment:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
+
+  app:
+    build: .
+    ports:
+        - "9095:9090" #<local-port>:<container-port>
